@@ -1,11 +1,27 @@
 {
   "name": "boternos",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "Minecraft AFK bot for Aternos.",
+  "main": "bot.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node bot.js"
   },
   "dependencies": {
+    "axios": "^1.6.5",
+    "express": "^4.19.2",
     "mineflayer": "^4.17.1"
-  }
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "keywords": [
+    "minecraft",
+    "bot",
+    "afk",
+    "aternos",
+    "mineflayer",
+    "render"
+  ],
+  "author": "Knoxius",
+  "license": "MIT"
 }
