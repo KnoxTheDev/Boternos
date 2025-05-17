@@ -5,16 +5,17 @@ const axios = require('axios');
 const HOST = 'Singhking_77.aternos.me';
 const PORT = 59005;
 const USERNAME = 'GULAAM';
-const JOIN_TIME = 3 * 60 * 1000; // 3 minutes
-const LEAVE_TIME = 20 * 1000;    // 20 seconds
-const SELF_URL = 'https://boternos.onrender.com';
+const JOIN_TIME = 3 * 60 * 1000;
+const LEAVE_TIME = 20 * 1000;
+const SELF_URL = 'https://boternos.onrender.com'; // your Render URL
 
 let bot = null;
+const app = express();
+app.get('/', (req, res) => res.send('AFK Bot is alive'));
+app.listen(10000, () => console.log('[HTTP] Keep-alive server listening on port 10000'));
 
 function safeLog(...args) {
-  try {
-    console.log(...args);
-  } catch (_) {}
+  try { console.log(...args); } catch (_) {}
 }
 
 function createBot() {
@@ -29,60 +30,41 @@ function createBot() {
 
     bot.on('login', () => safeLog('[INFO] GULAAM joined the server.'));
     bot.on('spawn', () => safeLog('[INFO] GULAAM is now active.'));
-    bot.on('end', () => safeLog('[INFO] Disconnected from server.'));
-    bot.on('error', (err) => safeLog('[ERROR] Bot error:', err.message));
+    bot.on('end', () => {
+      safeLog('[INFO] Disconnected from server.');
+      setTimeout(createBot, LEAVE_TIME);
+    });
+    bot.on('error', (err) => {
+      safeLog('[ERROR] Bot error:', err.message);
+    });
 
-    // Force quit after JOIN_TIME
+    // Leave after JOIN_TIME
     setTimeout(() => {
-      try {
-        if (bot) {
-          safeLog('[INFO] Leaving server after 3 minutes...');
-          bot.quit();
-          bot = null;
-        }
-      } catch (e) {
-        safeLog('[ERROR] Error while quitting:', e.message);
+      if (bot && typeof bot.quit === 'function') {
+        safeLog('[INFO] Leaving server after 3 minutes...');
+        bot.quit(); // triggers 'end' and restart
+        bot = null;
       }
-
-      // Rejoin after LEAVE_TIME
-      setTimeout(() => {
-        createBot(); // Recursively restart loop
-      }, LEAVE_TIME);
-
     }, JOIN_TIME);
 
   } catch (err) {
     safeLog('[ERROR] Bot crashed during setup:', err.message);
-    // Wait and retry
     setTimeout(createBot, LEAVE_TIME);
   }
 }
 
-// Self-ping server setup
-const app = express();
-app.get('/', (req, res) => {
-  res.send('GULAAM is awake 🟢');
-});
-const PORT_HTTP = process.env.PORT || 3000;
-app.listen(PORT_HTTP, () => {
-  safeLog(`[HTTP] Keep-alive server listening on port ${PORT_HTTP}`);
-});
-
-// Self-ping every 4 minutes
+// Self-ping loop to stay alive
 setInterval(() => {
-  axios.get(SELF_URL)
-    .then(() => safeLog('[PING] Self-pinged to stay awake.'))
-    .catch(err => safeLog('[PING ERROR]', err.message));
-}, 4 * 60 * 1000); // Every 4 minutes
+  axios.get(SELF_URL).then(() => {
+    safeLog('[HTTP] Self-ping successful.');
+  }).catch((err) => {
+    safeLog('[HTTP] Self-ping failed:', err.message);
+  });
+}, 4 * 60 * 1000); // ping every 4 minutes
 
-// Global protection from unhandled crashes
-process.on('uncaughtException', (err) => {
-  safeLog('[FATAL] Uncaught Exception:', err.message);
-});
+// Global protection
+process.on('uncaughtException', (err) => safeLog('[FATAL] Uncaught Exception:', err.message));
+process.on('unhandledRejection', (reason) => safeLog('[FATAL] Unhandled Rejection:', reason));
 
-process.on('unhandledRejection', (reason, promise) => {
-  safeLog('[FATAL] Unhandled Promise Rejection:', reason);
-});
-
-// Start bot loop
+// Start bot
 createBot();
