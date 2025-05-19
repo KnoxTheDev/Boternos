@@ -2,8 +2,8 @@ const mineflayer = require('mineflayer');
 const express = require('express');
 const axios = require('axios');
 
-const HOST = 'Singhking_77.aternos.me';
-const PORT = 59005;
+const HOST = 'notforkhapi.aternos.me';
+const PORT = 43482;
 const USERNAME = 'GULAAM';
 const JOIN_TIME = 3 * 60 * 1000;
 const LEAVE_TIME = 20 * 1000;
