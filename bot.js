@@ -3,7 +3,7 @@ const express = require('express');
 const axios = require('axios');
 
 const HOST = 'notforkhapi.aternos.me';
-const PORT = 43482;
+const PORT = 42482;
 const USERNAME = 'GULAAM';
 const JOIN_TIME = 3 * 60 * 1000;
 const LEAVE_TIME = 20 * 1000;
