@@ -2,7 +2,7 @@ const mineflayer = require('mineflayer');
 const express = require('express');
 const axios = require('axios');
 
-const HOST = 'warforsmp2025.aternos.me';
+const HOST = '185.107.194.14';
 const PORT = 13216;
 const USERNAME = 'GULAAM';
 const JOIN_TIME = 3 * 60 * 1000;
